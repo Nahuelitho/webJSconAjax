@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <title>Ejercicio 1 Ajax</title>
+
+  <script>
+    var usuarios = [];
+    var personasH = [];
+    var personasM = [];
+    /************************************************************************/
+    /************************************************************************/
+    /************************************************************************/
+    function ordenarPorApellido(usuarios) {
+      usuarios.sort((a, b) => a.results[0].name.last.localeCompare(b.results[0].name.last));
+    }
+    function ordenar() {
+      ordenarPorApellido(usuarios);
+
+      let listado = document.getElementById("listado");
+      listado.innerHTML = "";
+      listado2.innerHTML = "";
+      for (let i = 0; i < usuarios.length; i++) {
+        const usuario = usuarios[i].results[0];
+        if (usuario.gender === "female"){
+          const fila = `<tr id="${usuario.login.uuid}"><td> ${usuario.name.last} ${usuario.name.first}${'<br>Email: ' + usuario.email}${'<br>Pais: ' + usuario.location.country}</td><td><img src="${usuario.picture.medium}" title="${usuario.name.title + " " + usuario.name.first + " " + usuario.name.last + " - Celular: " + usuario.phone}"</td><td><input type="button" value="Eliminar" onclick="eliminar('${usuario.login.uuid}')"></td></tr><hr>`;
+        listado2.innerHTML += fila;
+        }else{
+          const fila = `<tr id="${usuario.login.uuid}"><td> ${usuario.name.last} ${usuario.name.first}${'<br>Email: ' + usuario.email}${'<br>Pais: ' + usuario.location.country}</td><td><img src="${usuario.picture.medium}" title="${usuario.name.title + " " + usuario.name.first + " " + usuario.name.last + " - Celular: " + usuario.phone}"</td><td><input type="button" value="Eliminar" onclick="eliminar('${usuario.login.uuid}')"></td></tr><hr>`;
+        listado.innerHTML += fila;
+        }
+      }
+    }
+    /************************************************************************/
+    /************************************************************************/
+    /************************************************************************/
+    function filtraAnios() {
+
+      let listado4 = document.getElementById("listado4");
+      listado4.innerHTML = "";
+      let cantAnios = document.getElementById("edadR").value;
+      let usuariosReg = usuarios.filter(usu => usu.results[0].registered.age == parseInt(cantAnios));
+
+      let list = "";
+      usuariosReg.forEach((usuario) => {
+        list += `<tr id="${usuario.results[0].login.uuid}"><td>${usuario.results[0].name.first} ${usuario.results[0].name.last} ${'<br>Email: ' + usuario.results[0].email}${'<br>Pais: ' + usuario.results[0].location.country}${'<br>Fecha Registro: ' + usuario.results[0].registered.age}</td><td><img src="${usuario.results[0].picture.medium}" title="${usuario.results[0].name.title + " " + usuario.results[0].name.first + " " + usuario.results[0].name.last + " - Celular: " + usuario.results[0].phone}"</td><td><input type="button" value="Eliminar" onclick="eliminar('${usuario.results[0].login.uuid}')"></td></tr><hr>`;
+      });
+
+      listado4.innerHTML += list;
+    }
+    /************************************************************************/
+    /************************************************************************/
+    /************************************************************************/
+    function cargar() {
+      var elemento = document.getElementById("comboPaises");
+      var opciones = '';
+      for (var i = 0; i < usuarios.length; i++) {
+        var pais = usuarios[i].results[0].location.country;
+        if (!listPaises.includes(pais)) {
+          listPaises.push(pais);
+          opciones += '<option value="' + pais + '">' + pais + '</option>';
+        }
+      }
+      elemento.innerHTML = opciones;
+    }
+    /************************************************************************/
+    function cargar2() {
+      let select = document.getElementById("comboPaises");
+      var listado3 = document.getElementById("listado3");
+      listado3.innerHTML = "";
+      select.addEventListener("change", function () {
+        var option = select.options[select.selectedIndex];
+        let filas = "";
+
+        for (var i = 0; i < usuarios.length; i++) {
+          if (usuarios[i].results[0].location.country === option.value) {
+            const fila = `<tr id="${usuarios[i].results[0].login.uuid}"><td>${usuarios[i].results[0].name.first} ${usuarios[i].results[0].name.last} ${'<br>Email: ' + usuarios[i].results[0].email}${'<br>Pais: ' + usuarios[i].results[0].location.country}${'<br>Fecha Registro: ' + usuarios[i].results[0].registered.age}</td><td><img src="${usuarios[i].results[0].picture.medium}" title="${usuarios[i].results[0].name.title + " " + usuarios[i].results[0].name.first + " " + usuarios[i].results[0].name.last + " - Celular: " + usuarios[i].results[0].phone}"</td><td><input type="button" value="Eliminar" onclick="eliminar('${usuarios[i].results[0].login.uuid}')"></td></tr><hr>`;
+            filas += fila;
+          }
+        }
+        listado3.innerHTML = filas;
+      });
+    }
+    /************************************************************************/
+    var listPaises = [];
+    function cargarXPaises() {
+      cargar();
+      cargar2();
+    }
+    /************************************************************************/
+    /************************************************************************/
+    /************************************************************************/
+    /************************************************************************/
+    function recuperarUsuario() {
+      var listado = document.getElementById("listado");
+      let cont = document.getElementById("cantidad").value;
+      for (let i = 0; i < cont; i++) {
+        fetch("https://randomuser.me/api/").
+          then((response) => response.json()).
+          then((usuario) => {
+
+            if (usuario.results[0].gender == "male") {
+              const fila = `<tr id="${usuario.results[0].login.uuid}"><td>${usuario.results[0].name.last} ${usuario.results[0].name.first}  ${'<br>Email: ' + usuario.results[0].email}${'<br>Pais: ' + usuario.results[0].location.country}${'<br>Fecha Registro: ' + usuario.results[0].registered.age}</td><td><img src="${usuario.results[0].picture.medium}" title="${usuario.results[0].name.title + " " + usuario.results[0].name.first + " " + usuario.results[0].name.last + " - Celular: " + usuario.results[0].phone}"</td><td><input type="button" value="Eliminar" onclick="eliminar('${usuario.results[0].login.uuid}')"></td></tr><hr>`;
+              listado.innerHTML += fila;
+              personasH.push(usuario);
+              usuarios.push(usuario);
+              //console.log(personasH);
+              //console.log(paises);
+            } else {
+              const fila = `<tr id="${usuario.results[0].login.uuid}"><td>${usuario.results[0].name.last} ${usuario.results[0].name.first}  ${'<br>Email: ' + usuario.results[0].email}${'<br>Pais: ' + usuario.results[0].location.country}${'<br>Fecha Registro: ' + usuario.results[0].registered.age}</td><td><img src="${usuario.results[0].picture.medium}" title="${usuario.results[0].name.title + " " + usuario.results[0].name.first + " " + usuario.results[0].name.last + " - Celular: " + usuario.results[0].phone}"</td><td><input type="button" value="Eliminar" onclick="eliminar('${usuario.results[0].login.uuid}')"></td></tr><hr>`;
+              listado2.innerHTML += fila;
+              personasM.push(usuario);
+              usuarios.push(usuario);
+            }
+          });
+      }
+    }
+    /************************************************************************/
+    function eliminar(id) {
+      fila = document.getElementById(id);
+      fila.parentNode.removeChild(fila);
+    }
+    /************************************************************************/
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="col-12 mt-4">
+      <span>Ingrese la cantidad de usuarios a ver: </span>
+      <input type="number" id="cantidad">
+      <br>
+      <br>
+      <form action="">
+        <input type="button" value="Recuperar un Usuario" onclick="recuperarUsuario()">
+        <input type="button" value="Ordenar por Apellido" onclick="ordenar()">
+      </form>
+      <br>
+      <!--<p id="fail" style="color: red;"></p>-->
+    </div>
+    <div class="row">
+      <div class="col-6 border pl-4 ">
+        <h2>Usuarios Hombres</h2>
+        <h1>Lista Usuarios Fake</h1>
+
+        <br>
+        <div>
+          <table id="listado">
+          </table>
+        </div>
+      </div>
+      <div class="col-6 border pr-4">
+        <h2>Usuario Mujeres</h2>
+        <h1>Lista Usuarios Fake</h1>
+        <br>
+        <br>
+        <!--<form action="">
+        <input type="button" value="Recuperar un Usuario" onclick="recuperarUsuario2()">
+    </form>-->
+
+        <div>
+          <table id="listado2">
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-6 border pt-4">
+
+        <label for="lang">Filtrar por pais: </label>
+        <select id="comboPaises">
+
+          <option value="" id="optionPaises">Todos los países</option>
+        </select>
+
+        <input type="button" value="Cargar Paises" onclick="cargarXPaises()" />
+
+      </div>
+      <div class="col-6 border pt-4">
+        <label for="lang">Filtrar por edad de registro: </label>
+        <input type="number" id="edadR">
+        <input type="button" value="Filtrar x Fecha Registro" onclick="filtraAnios()" />
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-6 border">
+        <h1>Lista Usuarios x Pais</h1>
+        <table id="listado3">
+
+        </table>
+      </div>
+      <div class="col-6 border">
+        <h1>Usuarios x Fecha Registro</h1>
+        <table id="listado4">
+
+        </table>
+      </div>
+    </div>
+  </div>
+  <!--<h1>Ejercicio 1 Ajax</h1>-->
+
+
+
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
